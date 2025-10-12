@@ -1,0 +1,36 @@
+PREFIX schema: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+CONSTRUCT {
+  ?transaction a schema:PurchaseAction ;
+               schema:customer ?customer ;
+               schema:location ?location ;
+               schema:productCategory ?product ;
+               schema:amount ?amount ;
+               schema:dateTime ?dateTime .
+
+  ?customer a foaf:Person ;
+            foaf:age ?age ;
+            schema:memberTier ?loyalty .
+
+  ?location a schema:Place ;
+            schema:name ?locationName .
+
+  ?product a schema:Product ;
+           schema:name ?productName .
+}
+WHERE {
+  BIND (IRI(CONCAT("http://example.org/transaction/", STRUUID())) AS ?transaction)
+  BIND (IRI(CONCAT("http://example.org/customer/", STRUUID())) AS ?customer)
+  BIND (IRI(CONCAT("http://example.org/location/", REPLACE(?Location," ","_"))) AS ?location)
+  BIND (IRI(CONCAT("http://example.org/productCategory/", REPLACE(?Product_Category," ","_"))) AS ?product)
+
+  BIND (?Purchase_Amount AS ?amount)
+  BIND (xsd:dateTime(CONCAT(?Transaction_Date,"T",?Transaction_Time)) AS ?dateTime)
+  BIND (?Customer_Age AS ?age)
+  BIND (?Customer_Loyalty_Tier AS ?loyalty)
+  BIND (?Location AS ?locationName)
+  BIND (?Product_Category AS ?productName)
+}
