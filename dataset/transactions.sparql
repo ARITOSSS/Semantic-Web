@@ -2,6 +2,9 @@ PREFIX schema: <https://schema.org/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 CONSTRUCT {
   ?transaction a schema:PurchaseAction ;
@@ -16,7 +19,9 @@ CONSTRUCT {
             schema:memberTier ?loyalty .
 
   ?location a schema:Place ;
-            schema:name ?locationName .
+            schema:name ?locationName ;
+            dbo:country ?country ;
+            rdfs:label ?countryLabel .
 
   ?product a schema:Product ;
            schema:name ?productName .
@@ -33,4 +38,8 @@ WHERE {
   BIND (?Customer_Loyalty_Tier AS ?loyalty)
   BIND (?Location AS ?locationName)
   BIND (?Product_Category AS ?productName)
+
+  # Lien vers le pays DBpedia
+  BIND (IRI(CONCAT("http://dbpedia.org/resource/", ?Country)) AS ?country)
+  BIND (?Country AS ?countryLabel)
 }
