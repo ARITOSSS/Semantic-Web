@@ -12,7 +12,8 @@ CONSTRUCT {
                schema:location ?location ;
                schema:productCategory ?product ;
                schema:amount ?amount ;
-               schema:dateTime ?dateTime .
+               schema:dateTime ?dateTime ;
+               dbo:country ?country .
 
   ?customer a foaf:Person ;
             foaf:age ?age ;
