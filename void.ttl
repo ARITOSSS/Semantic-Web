@@ -1,0 +1,36 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema: <https://schema.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix ex: <http://example.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ex:Dataset_FraudTransactions a void:Dataset ;
+    dcterms:title "Fraud Transaction on Pop-Up Store" ;
+    dcterms:description "Ce dataset contient 21 218 triplets représentant des transactions dans un pop-up store, incluant les informations sur les clients (âge, niveau de fidélité), les produits (nom, catégorie), les lieux (ville, pays) et les montants. Certaines ressources sont liées à DBpedia et Wikidata pour permettre l’interopérabilité avec d’autres datasets RDF." ;
+    dcterms:creator "Cligny Aristie, Naël Lomig , Penet Louis, Rodrigues Xavi" ;
+    dcterms:created "2025-11-02"^^xsd:date ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    void:vocabulary schema:, foaf:, dbo:, dbr: ;
+    void:triples 21218 ;
+    void:entities 700 ;
+    void:classes 4 ;
+    void:properties 10 ;
+    void:exampleResource ex:transaction/17410e6c-32cd-4e4c-96eb-80b19ea6399d ;
+    void:linkset ex:Linkset_DBpedia, ex:Linkset_Wikidata ;
+    void:dataDump <http://example.org/data/fraud_transactions.ttl> .
+
+ex:Linkset_DBpedia a void:Linkset ;
+    void:linkPredicate owl:sameAs ;
+    void:subjectsTarget ex:Dataset_FraudTransactions ;
+    void:objectsTarget <http://dbpedia.org/> ;
+    void:triples 150 .  # Estimation, peut être mise à jour si tu comptes les vrais liens
+
+ex:Linkset_Wikidata a void:Linkset ;
+    void:linkPredicate owl:sameAs ;
+    void:subjectsTarget ex:Dataset_FraudTransactions ;
+    void:objectsTarget <https://www.wikidata.org/> ;
+    void:triples 80 .   # Estimation, peut être mise à jour si tu comptes les vrais liens
