@@ -27,10 +27,9 @@ ex:Linkset_DBpedia a void:Linkset ;
     void:linkPredicate owl:sameAs ;
     void:subjectsTarget ex:Dataset_FraudTransactions ;
     void:objectsTarget <http://dbpedia.org/> ;
-    void:triples 150 .  # Estimation, peut être mise à jour si tu comptes les vrais liens
 
 ex:Linkset_Wikidata a void:Linkset ;
     void:linkPredicate owl:sameAs ;
     void:subjectsTarget ex:Dataset_FraudTransactions ;
     void:objectsTarget <https://www.wikidata.org/> ;
-    void:triples 80 .   # Estimation, peut être mise à jour si tu comptes les vrais liens
+
