@@ -1,0 +1,66 @@
+PREFIX schema: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX ex: <http://example.org/ontology/>
+
+CONSTRUCT {
+  # Graphe principal
+  ?transaction a schema:PurchaseAction ;
+               a schema:Action ;
+               a ?transactionType ;
+               schema:customer ?customer ;
+               schema:location ?location ;
+               schema:productCategory ?product ;
+               schema:amount ?amount ;
+               schema:dateTime ?dateTime ;
+               dbo:country ?country .
+
+  # Customer enrichi avec inférences
+  ?customer a foaf:Person ;
+            a dbo:Agent ;
+            a ?customerType ;
+            foaf:age ?age ;
+            schema:memberTier ?loyalty .
+
+  # Location et pays
+  ?location a schema:Place ;
+            schema:name ?locationName ;
+            dbo:country ?country ;
+            rdfs:label ?countryLabel .
+
+  # Liens Linked Data pour le pays
+  ?country owl:sameAs ?dbCountry ;
+           rdfs:seeAlso ?dbCountry .
+
+  # Produit et catégories
+  ?product a schema:Product ;
+           schema:name ?productName ;
+           owl:sameAs <http://dbpedia.org/resource/Product> .
+}
+WHERE {
+  BIND (IRI(CONCAT("http://example.org/transaction/", STRUUID())) AS ?transaction)
+  BIND (IRI(CONCAT("http://example.org/customer/", STRUUID())) AS ?customer)
+  BIND (IRI(CONCAT("http://example.org/location/", REPLACE(?Location," ","_"))) AS ?location)
+  BIND (IRI(CONCAT("http://example.org/productCategory/", REPLACE(?Product_Category," ","_"))) AS ?product)
+
+  BIND (?Purchase_Amount AS ?amount)
+  BIND (xsd:dateTime(CONCAT(?Transaction_Date,"T",?Transaction_Time)) AS ?dateTime)
+  BIND (?Customer_Age AS ?age)
+  BIND (?Customer_Loyalty_Tier AS ?loyalty)
+  BIND (?Location AS ?locationName)
+  BIND (?Product_Category AS ?productName)
+
+  BIND (IRI(CONCAT("http://dbpedia.org/resource/", ?Country)) AS ?dbCountry)
+  BIND (?Country AS ?countryLabel)
+
+  # Définir le type de transaction conditionnellement
+  BIND(IF(?amount > 200, ex:HighValuePurchase, schema:PurchaseAction) AS ?transactionType)
+
+  # Définir le type de customer conditionnellement
+  BIND(IF(?loyalty = "Gold", ex:VIPCustomer, ex:Customer) AS ?customerType)
+}
