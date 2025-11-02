@@ -1,0 +1,155 @@
+# REQUETE GROUPE 3
+
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX schema: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?country ?avgHeight ?purchaseCount
+WHERE {
+  {
+    SELECT ?country (AVG(?height) AS ?avgHeight)
+    WHERE {
+      SERVICE <http://localhost:3030/nba/sparql> {
+        ?player dbo:birthPlace/dbo:country ?country ;
+                dcterms:temporal/dbo:height ?height .
+      }
+    }
+    GROUP BY ?country
+  }
+
+  {
+    SELECT ?country (COUNT(?purchase) AS ?purchaseCount)
+    WHERE {
+      SERVICE <http://localhost:3030/fraude/sparql> {
+        ?purchase a schema:PurchaseAction ;
+                  schema:location ?town .
+        ?town dbo:country ?country .
+      }
+    }
+    GROUP BY ?country
+  }
+}
+ORDER BY DESC(?avgHeight)
+
+
+#REQUETE GROUPE 3+12
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX schema: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?country ?avgHeight ?purchaseCount ?currencies
+WHERE {
+  {
+    SELECT ?country (AVG(?height) AS ?avgHeight)
+    WHERE {
+      SERVICE <http://localhost:3030/nba/sparql> {
+        ?player dbo:birthPlace/dbo:country ?country ;
+                dcterms:temporal/dbo:height ?height .
+      }
+    }
+    GROUP BY ?country
+  }
+
+  {
+    SELECT ?country (COUNT(?purchase) AS ?purchaseCount)
+    WHERE {
+      SERVICE <http://localhost:3030/fraude/sparql> {
+        ?purchase a schema:PurchaseAction ;
+                  schema:location ?town .
+        ?town dbo:country ?country .
+      }
+    }
+    GROUP BY ?country
+  }
+
+  {
+    SELECT ?country (GROUP_CONCAT(DISTINCT ?currency; separator=", ") AS ?currencies)
+    WHERE {
+      SERVICE <http://localhost:3030/currency/sparql> {
+        ?currency ^rdfs:label/dbo:usedInCountry ?country .
+      }
+    }
+    GROUP BY ?country
+  }
+}
+ORDER BY DESC(?purchaseCount)
+
+#REQUETE REQUETE GROUPE 3+12+8
+
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX schema: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?country ?fraudCount ?avgHeight ?currencies ?athleteCount ?maleAthleteCount ((?maleAthleteCount / ?athleteCount) * 100 AS ?malePercentage)
+WHERE {
+  {
+    SELECT ?country (AVG(?height) AS ?avgHeight)
+    WHERE {
+      SERVICE <http://localhost:3030/nba/sparql> {
+        ?player dbo:birthPlace/dbo:country ?country ;
+                dcterms:temporal/dbo:height ?height .
+      }
+    }
+    GROUP BY ?country
+  }
+
+  {
+    SELECT ?country (COUNT(?purchase) AS ?fraudCount)
+    WHERE {
+      SERVICE <http://localhost:3030/fraude/sparql> {
+        ?purchase a schema:PurchaseAction ;
+                  schema:location ?town .
+        ?town dbo:country ?country .
+      }
+    }
+    GROUP BY ?country
+  }
+
+  {
+    SELECT ?country (GROUP_CONCAT(DISTINCT ?currency; separator=", ") AS ?currencies)
+    WHERE {
+      SERVICE <http://localhost:3030/currency/sparql> {
+        ?currency ^rdfs:label/dbo:usedInCountry ?country .
+      }
+    }
+    GROUP BY ?country
+  }
+  
+  {
+	SELECT ?country (COUNT(?person) AS ?athleteCount)
+    WHERE{
+      SERVICE <http://localhost:3030/athletes/sparql> {
+        ?person dbo:nationality ?country ;
+                dbo:gender ?gender
+      }
+    }
+    GROUP BY ?country
+  }
+  
+   {
+    SELECT ?country (COUNT(?person) AS ?maleAthleteCount)
+    WHERE {
+      SERVICE <http://localhost:3030/athletes/sparql> {
+        ?person dbo:nationality ?country ;
+                dbo:gender ?gender .
+        FILTER (?gender = dbr:Male)
+      }
+    }
+    GROUP BY ?country
+  }
+  
+}
+ORDER BY DESC(?fraudCount)
