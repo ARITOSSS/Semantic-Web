@@ -157,7 +157,7 @@ ORDER BY DESC(?fraudCount)
 
 
 
-#REQUETE GROUPE 8+12
+#REQUETE GROUPE 6+8
 
 PREFIX schemaTx:  <https://schema.org/>          # transactions(1).ttl
 PREFIX dbo:       <http://dbpedia.org/ontology/>
