@@ -159,60 +159,45 @@ ORDER BY DESC(?fraudCount)
 
 #REQUETE GROUPE 6+8
 
-PREFIX schemaTx:  <https://schema.org/>          # transactions(1).ttl
+PREFIX schema: <http://schema.org/>
+PREFIX schemaTx:  <https://schema.org/>  
 PREFIX dbo:       <http://dbpedia.org/ontology/>
 PREFIX rdfs:      <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd:       <http://www.w3.org/2001/XMLSchema#>
-PREFIX pop:       <http://example.org/population/>   # world_population_with_requete_construct.ttl
-PREFIX schemaPop: <http://schema.org/>
-PREFIX sport:     <http://purl.org/sport/>       # athletes.ttl
+PREFIX pop:       <http://example.org/population/> 
+PREFIX sport:     <http://purl.org/sport/>
 
-SELECT ?countryNameTx ?continent
-       (SUM(?amount) AS ?totalAmount)
-       ?populationApprox
-       (COUNT(DISTINCT ?ath) AS ?nbAthletes)
-       ( SUM(?amount) / (?populationApprox / 1000000) AS ?amountPerMillionInhabitants )
+SELECT ?countryNameTx ?continent (SUM(?amount) AS ?totalAmount) ?populationApprox 
+		(COUNT(DISTINCT ?ath) AS ?nbAthletes) 
+		( SUM(?amount) / (?populationApprox / 1000000) AS ?amountPerMillionInhabitants )
 WHERE {
-
-  ## 1) Transactions dans /Transactions
   ?t a schemaTx:PurchaseAction ;
      schemaTx:amount ?amountLit ;
-     dbo:country     ?dbpCountry .
-
-  # Montant en décimal
-  BIND(xsd:decimal(?amountLit) AS ?amount)
-
-  # Nom du pays à partir de l'URI DBpedia
-  #   ex: http://dbpedia.org/resource/United_Arab_Emirates
-  #   -> "United Arab Emirates"
+ 	 schemaTx:location/dbo:country ?dbpCountry .
+  
+   BIND(xsd:decimal(?amountLit) AS ?amount)
+  
   BIND( STRAFTER(STR(?dbpCountry), "resource/") AS ?countryLocal )
-  BIND( REPLACE(?countryLocal, "_", " ")          AS ?countryNameTxRaw )
-  BIND( LCASE(?countryNameTxRaw)                  AS ?countryNameTx_lc )
-  BIND( ?countryNameTxRaw                         AS ?countryNameTx )
-
-  ## 2) Données de population via SERVICE world_population
-  SERVICE <http://localhost:3030/world_population_with_requete_construct/sparql> {
+  BIND( REPLACE(?countryLocal, "_", " ") AS ?countryNameTxRaw )
+  BIND( LCASE(?countryNameTxRaw) AS ?countryNameTx_lc )
+  BIND( ?countryNameTxRaw AS ?countryNameTx )
+  
+  SERVICE <http://localhost:3030/world_pop/sparql> {
     ?popCountry a pop:Country ;
-                schemaPop:name      ?popName ;
-                schemaPop:continent ?continent ;
+                schema:name      ?popName ;
+                schema:continent ?continent ;
                 pop:areaKm2         ?areaKm2 ;
                 pop:density         ?density .
 
     BIND( LCASE(STR(?popName)) AS ?countryNamePop_lc )
-  }
-
-  # Jointure texte pays (tolérante : égalité ou inclusion, pour gérer
-  # "United States" / "United States of America", etc.)
+  }  
   FILTER(
     ?countryNameTx_lc = ?countryNamePop_lc ||
     CONTAINS(?countryNameTx_lc, ?countryNamePop_lc) ||
     CONTAINS(?countryNamePop_lc, ?countryNameTx_lc)
   )
-
-  # Population approx = surface × densité
   BIND( xsd:decimal(?areaKm2) * xsd:decimal(?density) AS ?populationApprox )
-
-  ## 3) Athlètes via SERVICE athletes (optionnel)
+  
   OPTIONAL {
     SERVICE <http://localhost:3030/athletes/sparql> {
       ?ath a sport:Athlete ;
