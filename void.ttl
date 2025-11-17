@@ -11,7 +11,7 @@
 ex:Dataset_FraudTransactions a void:Dataset ;
     dcterms:title "Fraud Transaction on Pop-Up Store" ;
     dcterms:description "Ce dataset contient 21 218 triplets représentant des transactions dans un pop-up store, incluant les informations sur les clients (âge, niveau de fidélité), les produits (nom, catégorie), les lieux (ville, pays) et les montants. Certaines ressources sont liées à DBpedia et Wikidata pour permettre l’interopérabilité avec d’autres datasets RDF." ;
-    dcterms:creator "Cligny Aristie, Naël Lomig , Penet Louis, Rodrigues Xavi" ;
+    dcterms:creator "Cligny Aristie, Naël Lomig , Penet Louis, Rodrigues Xabi" ;
     dcterms:created "2025-11-02"^^xsd:date ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     void:vocabulary schema:, foaf:, dbo:, dbr: ;
